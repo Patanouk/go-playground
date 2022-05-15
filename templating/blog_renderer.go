@@ -25,10 +25,19 @@ func NewBlogRenderer() (*blogRenderer, error) {
 	return &blogRenderer{template: blogTemplate}, nil
 }
 
-func (r blogRenderer) Render(w io.Writer, p *blog.Post) error {
+func (r blogRenderer) RenderIndex(w io.Writer, posts []blog.Post) error {
+
+	if err := r.template.ExecuteTemplate(w, "index.gohtml", posts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r blogRenderer) RenderPost(w io.Writer, p *blog.Post) error {
 	html := markdown.ToHTML([]byte(p.Body), nil, nil)
 
-	if err := r.template.Execute(w, blog.Post{
+	if err := r.template.ExecuteTemplate(w, "blog.gohtml", blog.Post{
 		Title:       p.Title,
 		Description: p.Description,
 		Body:        string(html),
