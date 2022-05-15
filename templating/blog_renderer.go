@@ -2,6 +2,7 @@ package templating
 
 import (
 	"embed"
+	"github.com/gomarkdown/markdown"
 	"go-playground/blog"
 	"html/template"
 	"io"
@@ -25,8 +26,14 @@ func NewBlogRenderer() (*blogRenderer, error) {
 }
 
 func (r blogRenderer) Render(w io.Writer, p *blog.Post) error {
+	html := markdown.ToHTML([]byte(p.Body), nil, nil)
 
-	if err := r.template.Execute(w, p); err != nil {
+	if err := r.template.Execute(w, blog.Post{
+		Title:       p.Title,
+		Description: p.Description,
+		Body:        string(html),
+		Tags:        p.Tags,
+	}); err != nil {
 		return err
 	}
 

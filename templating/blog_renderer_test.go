@@ -12,7 +12,7 @@ func TestRender(t *testing.T) {
 	var (
 		aPost = blog.Post{
 			Title:       "hello world",
-			Body:        "This is a post",
+			Body:        "#This is a test  `code`",
 			Description: "This is a description",
 			Tags:        []string{"go", "tdd"},
 		}
