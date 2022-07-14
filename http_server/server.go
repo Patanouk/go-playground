@@ -19,13 +19,14 @@ func (p PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		p.processWin(w)
+		p.processWin(w, player)
 	case http.MethodGet:
 		p.showScore(w, player)
 	}
 }
 
-func (p PlayerServer) processWin(w http.ResponseWriter) {
+func (p PlayerServer) processWin(w http.ResponseWriter, player string) {
+	p.store.recordWin(player)
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -40,10 +41,15 @@ func (p PlayerServer) showScore(w http.ResponseWriter, player string) {
 
 type PlayerStore interface {
 	getPlayerScore(name string) (int, bool)
+	recordWin(name string)
 }
 
 type InMemoryPlayerStore struct{}
 
 func (s InMemoryPlayerStore) getPlayerScore(name string) (int, bool) {
 	return 123, true
+}
+
+func (s InMemoryPlayerStore) recordWin(name string) {
+
 }

@@ -46,20 +46,32 @@ func TestGETPlayers(t *testing.T) {
 }
 
 func TestStoreWins(t *testing.T) {
-	store := stubPlayerStore{}
+	store := stubPlayerStore{
+		scores: make(map[string]int),
+	}
 	server := PlayerServer{&store}
 
-	t.Run("server returns 200 when posting score", func(t *testing.T) {
+	t.Run("server returns increment score when posting win", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
 		assertStatusCode(t, response.Code, http.StatusAccepted)
+
+		request, _ = http.NewRequest(http.MethodGet, "/players/Pepper", nil)
+		response = httptest.NewRecorder()
+		server.ServeHTTP(response, request)
+
+		assertResponseBody(t, response.Body.String(), "1")
 	})
 }
 
 type stubPlayerStore struct {
 	scores map[string]int
+}
+
+func (p *stubPlayerStore) recordWin(name string) {
+	p.scores[name] = p.scores[name] + 1
 }
 
 func (p *stubPlayerStore) getPlayerScore(name string) (int, bool) {
