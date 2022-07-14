@@ -5,7 +5,7 @@ import (
 )
 
 type FileSystemPlayerStore struct {
-	database io.Reader
+	database io.ReadSeeker
 }
 
 func (f *FileSystemPlayerStore) getPlayerScore(name string) (int, bool) {
@@ -19,6 +19,7 @@ func (f *FileSystemPlayerStore) recordWin(name string) {
 }
 
 func (f *FileSystemPlayerStore) getLeague() []Player {
+	f.database.Seek(0, 0)
 	league, _ := NewLeague(f.database)
 	return league
 }

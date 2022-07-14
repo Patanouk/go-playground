@@ -15,13 +15,15 @@ func TestFileSystemStore(t *testing.T) {
 
 		store := FileSystemPlayerStore{database}
 
-		got := store.getLeague()
-
 		want := []Player{
 			{"Cleo", 10},
 			{"Chris", 33},
 		}
 
+		got := store.getLeague()
+		assertLeague(t, got, want)
+
+		got = store.getLeague()
 		assertLeague(t, got, want)
 	})
 }
