@@ -1,9 +1,11 @@
 package http_server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"testing"
 )
 
@@ -68,7 +70,12 @@ func TestStoreWins(t *testing.T) {
 
 //server_test.go
 func TestLeague(t *testing.T) {
-	store := stubPlayerStore{}
+	wantedLeague := []Player{
+		{"Cleo", 32},
+		{"Chris", 20},
+		{"Tiest", 14},
+	}
+	store := stubPlayerStore{league: wantedLeague}
 	server := NewPlayerServer(&store)
 
 	t.Run("it returns 200 on /league", func(t *testing.T) {
@@ -77,12 +84,25 @@ func TestLeague(t *testing.T) {
 
 		server.ServeHTTP(response, request)
 
+		var got []Player
+
+		err := json.NewDecoder(response.Body).Decode(&got)
+
+		if err != nil {
+			t.Fatalf("Unable to parse response '%q' from /league endpoint into slice of players, '%v'", response.Body, err)
+		}
+
 		assertStatus(t, response.Code, http.StatusOK)
+
+		if !reflect.DeepEqual(got, wantedLeague) {
+			t.Errorf("got %v, want %v", got, wantedLeague)
+		}
 	})
 }
 
 type stubPlayerStore struct {
 	scores map[string]int
+	league []Player
 }
 
 func (p *stubPlayerStore) recordWin(name string) {
@@ -92,6 +112,10 @@ func (p *stubPlayerStore) recordWin(name string) {
 func (p *stubPlayerStore) getPlayerScore(name string) (int, bool) {
 	score, ok := p.scores[name]
 	return score, ok
+}
+
+func (p *stubPlayerStore) getLeague() []Player {
+	return p.league
 }
 
 func assertResponseBody(t testing.TB, got, want string) {

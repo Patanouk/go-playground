@@ -1,6 +1,7 @@
 package http_server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -34,7 +35,12 @@ func (p *PlayerServer) playerHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (p *PlayerServer) leagueHandler(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(p.getLeagueTable())
 	w.WriteHeader(http.StatusOK)
+}
+
+func (p *PlayerServer) getLeagueTable() []Player {
+	return p.store.getLeague()
 }
 
 func (p *PlayerServer) processWin(w http.ResponseWriter, player string) {
@@ -49,4 +55,9 @@ func (p *PlayerServer) showScore(w http.ResponseWriter, player string) {
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}
+}
+
+type Player struct {
+	Name string
+	Wins int
 }

@@ -3,6 +3,7 @@ package http_server
 type PlayerStore interface {
 	getPlayerScore(name string) (int, bool)
 	recordWin(name string)
+	getLeague() []Player
 }
 
 type InMemoryPlayerStore struct {
@@ -22,4 +23,8 @@ func (s *InMemoryPlayerStore) getPlayerScore(name string) (int, bool) {
 
 func (s *InMemoryPlayerStore) recordWin(name string) {
 	s.scores[name]++
+}
+
+func (s *InMemoryPlayerStore) getLeague() []Player {
+	return nil
 }
