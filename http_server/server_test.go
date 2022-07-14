@@ -71,7 +71,7 @@ func TestStoreWins(t *testing.T) {
 //server_test.go
 func TestLeague(t *testing.T) {
 
-	t.Run("it returns 200 on /league", func(t *testing.T) {
+	t.Run("it returns the league table as JSON", func(t *testing.T) {
 		wantedLeague := []Player{
 			{"Cleo", 32},
 			{"Chris", 20},
@@ -88,7 +88,14 @@ func TestLeague(t *testing.T) {
 		got := getLeagueFromResponse(response)
 		assertStatus(t, response.Code, http.StatusOK)
 		assertLeague(t, got, wantedLeague)
+		assertContentType(t, response, jsonContentType)
 	})
+}
+
+func assertContentType(t *testing.T, response *httptest.ResponseRecorder, want string) {
+	if response.Result().Header.Get("content-type") != want {
+		t.Errorf("response did not have content-type of %s, got %v", want, response.Result().Header)
+	}
 }
 
 type stubPlayerStore struct {
