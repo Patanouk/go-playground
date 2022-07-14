@@ -1,7 +1,6 @@
 package http_server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -152,7 +151,6 @@ func newGetLeagueRequest() *http.Request {
 }
 
 func getLeagueFromResponse(response *httptest.ResponseRecorder) []Player {
-	var got []Player
-	json.NewDecoder(response.Body).Decode(&got)
-	return got
+	league, _ := NewLeague(response.Body)
+	return league
 }
