@@ -16,15 +16,21 @@ func NewPlayerServer(store PlayerStore) *PlayerServer {
 
 func (p PlayerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	player := strings.TrimPrefix(r.URL.Path, "/players/")
-	fmt.Fprint(w, p.store.getPlayerScore(player))
+
+	score, found := p.store.getPlayerScore(player)
+	if found {
+		fmt.Fprint(w, score)
+	} else {
+		w.WriteHeader(http.StatusNotFound)
+	}
 }
 
 type PlayerStore interface {
-	getPlayerScore(name string) int
+	getPlayerScore(name string) (int, bool)
 }
 
 type InMemoryPlayerStore struct{}
 
-func (s InMemoryPlayerStore) getPlayerScore(name string) int {
-	return 123
+func (s InMemoryPlayerStore) getPlayerScore(name string) (int, bool) {
+	return 123, true
 }
