@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	store := &http_server.InMemoryPlayerStore{}
-	server := http_server.NewPlayerServer(store)
+	server := http_server.NewPlayerServer(http_server.NewInMemoryPlayerStore())
 	log.Fatal(http.ListenAndServe(":5000", server))
 }
