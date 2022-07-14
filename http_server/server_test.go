@@ -14,7 +14,7 @@ func TestGETPlayers(t *testing.T) {
 			"Floyd":  10,
 		},
 	}
-	server := &PlayerServer{&store}
+	server := NewPlayerServer(&store)
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
 		request := getScoreRequest("Pepper")
@@ -49,7 +49,7 @@ func TestStoreWins(t *testing.T) {
 	store := stubPlayerStore{
 		scores: make(map[string]int),
 	}
-	server := PlayerServer{&store}
+	server := NewPlayerServer(&store)
 
 	t.Run("server returns increment score when posting win", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodPost, "/players/Pepper", nil)
@@ -69,7 +69,7 @@ func TestStoreWins(t *testing.T) {
 //server_test.go
 func TestLeague(t *testing.T) {
 	store := stubPlayerStore{}
-	server := &PlayerServer{&store}
+	server := NewPlayerServer(&store)
 
 	t.Run("it returns 200 on /league", func(t *testing.T) {
 		request, _ := http.NewRequest(http.MethodGet, "/league", nil)
