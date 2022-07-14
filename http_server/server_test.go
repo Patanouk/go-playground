@@ -19,7 +19,7 @@ func TestGETPlayers(t *testing.T) {
 	server := NewPlayerServer(&store)
 
 	t.Run("returns Pepper's score", func(t *testing.T) {
-		request := getScoreRequest("Pepper")
+		request := newGetScoreRequest("Pepper")
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -29,7 +29,7 @@ func TestGETPlayers(t *testing.T) {
 	})
 
 	t.Run("returns Floyd's score", func(t *testing.T) {
-		request := getScoreRequest("Floyd")
+		request := newGetScoreRequest("Floyd")
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -39,7 +39,7 @@ func TestGETPlayers(t *testing.T) {
 	})
 
 	t.Run("returns 404 on missing player", func(t *testing.T) {
-		request := getScoreRequest("Missing")
+		request := newGetScoreRequest("Missing")
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
@@ -80,13 +80,13 @@ func TestLeague(t *testing.T) {
 		store := stubPlayerStore{league: wantedLeague}
 		server := NewPlayerServer(&store)
 
-		request, _ := getLeagueRequest()
+		request := newGetLeagueRequest()
 		response := httptest.NewRecorder()
 
 		server.ServeHTTP(response, request)
-
 		got := getLeagueFromResponse(response)
-		assertStatus(t, response.Code, http.StatusOK)
+
+		assertStatusCode(t, response.Code, http.StatusOK)
 		assertLeague(t, got, wantedLeague)
 		assertContentType(t, response, jsonContentType)
 	})
@@ -136,13 +136,19 @@ func assertLeague(t *testing.T, got []Player, wantedLeague []Player) {
 	}
 }
 
-func getScoreRequest(name string) *http.Request {
+func newGetScoreRequest(name string) *http.Request {
 	request, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("/players/%s", name), nil)
 	return request
 }
 
-func getLeagueRequest() (*http.Request, error) {
-	return http.NewRequest(http.MethodGet, "/league", nil)
+func newPostWinRequest(name string) *http.Request {
+	request, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/players/%s", name), nil)
+	return request
+}
+
+func newGetLeagueRequest() *http.Request {
+	request, _ := http.NewRequest(http.MethodGet, "/league", nil)
+	return request
 }
 
 func getLeagueFromResponse(response *httptest.ResponseRecorder) []Player {
