@@ -1,6 +1,7 @@
 package http_server
 
 import (
+	"encoding/json"
 	"io"
 )
 
@@ -19,8 +20,16 @@ func (f *FileSystemPlayerStore) getPlayerScore(name string) (int, bool) {
 }
 
 func (f *FileSystemPlayerStore) recordWin(name string) {
-	//TODO implement me
-	panic("implement me")
+	league := f.getLeague()
+
+	for i, player := range league {
+		if player.Name == name {
+			league[i].Wins++
+		}
+	}
+
+	f.database.Seek(0, 0)
+	json.NewEncoder(f.database).Encode(league)
 }
 
 func (f *FileSystemPlayerStore) getLeague() []Player {
